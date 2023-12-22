@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "986161942967",
+    "project_id": "nacho-momma",
+    "storage_bucket": "nacho-momma.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:986161942967:android:e2392057cc3332f8ee9832",
+        "android_client_info": {
+          "package_name": "com.CITex.project_blue_chip"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7D5XUv3bhqvB5V1LlWwwSEoNHVmsKpho"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
