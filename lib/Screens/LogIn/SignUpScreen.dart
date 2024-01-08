@@ -7,6 +7,7 @@ import '../../Custom Data/Users.dart';
 import '../../Enums/CreateAccount Status.dart';
 import '../../Firebase/UserFirebase.dart';
 import '../../Widgets/TextFields.dart';
+import '../Main Menu/NavigationScreen.dart';
 
 
 
@@ -132,7 +133,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(content: Text("Signed in with ${users.email}")));
 
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>MainMenuScreen(users: users,)));
+                                        Navigator.push(context, MaterialPageRoute(builder: (context)=> NavigationScreen(users: users,)));
 
 
                                       }

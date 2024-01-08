@@ -35,9 +35,9 @@ if (keystorePropertiesFile.exists()) {
 
 
 android {
-    namespace "com.CITex.project_blue_chip"
+    namespace "com.example.project_blue_chip"
     compileSdkVersion 34
-    ndkVersion flutter.ndkVersion
+    ndkVersion '25.1.8937393'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -61,6 +61,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -85,4 +86,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation 'com.android.support:multidex:2.0.1'
+}

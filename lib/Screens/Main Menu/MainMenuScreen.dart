@@ -1,67 +1,62 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:project_blue_chip/Custom%20Data/Events.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:intl/intl.dart';
 import 'package:project_blue_chip/Firebase/BookingEventsFirebase.dart';
 import 'package:project_blue_chip/Firebase/UserFirebase.dart';
 import 'package:project_blue_chip/Screens/LogIn/SignInScreen.dart';
-import 'package:project_blue_chip/Screens/Schedule/Admin/AdminScheduleScreen.dart';
-import 'package:project_blue_chip/Screens/Schedule/ScheduleScreen.dart';
+
+import 'package:spring/spring.dart';
 
 import '../../Custom Data/BlackOutDates.dart';
+import '../../Custom Data/TestData.dart';
 import '../../Custom Data/Users.dart';
-import '../Food Menu/CategoryMenuScreen.dart';
-import '../Schedule/OpenSchedule.dart';
-import '../Settings/Settings.dart';
-
+import '../../Firebase/Push Notifications/pushNotification.dart';
 
 class MainMenuScreen extends StatefulWidget {
   final Users users;
 
-  MainMenuScreen({required this.users});
+  const MainMenuScreen({super.key, required this.users});
 
   @override
   State<MainMenuScreen> createState() => _MainMenuScreenState();
 }
 
 class _MainMenuScreenState extends State<MainMenuScreen> {
-
   UsersFirebase usersFirebase = UsersFirebase();
-  BookingEventsFirebase bookingEventsFirebase = BookingEventsFirebase();
+  TestData testData = TestData();
 
 
-
-  List<DateTime> blackoutDates = [];
-
-  setUp() async {
-    final docRef = FirebaseFirestore.instance
-        .collection('blackOutDates').withConverter(
-        fromFirestore: BlackOutDates.fromFireStore,
-        toFirestore: (BlackOutDates blackOutDates, options) =>
-            blackOutDates.toFireStore()).get().then((value) async =>
-    {
-      value.docs.forEach((element) {
-        blackoutDates.add(element
-            .data()
-            .startTime);
-        print("${element
-            .data()
-            .startTime}");
-      }),
-      // print("Black out")
-    });
-
-    bookingEventsFirebase.getAllEvents();
-
-    //print("Black out length ${blackoutDates.length}");
+  String greeting(){
+    var hour = DateTime.now().hour;
+    if(hour<12){
+      return 'Good Morning';
+    }
+    if(hour<17){
+      return 'Good Afternoon';
+    }
+    return 'Good Evening';
   }
 
+  String greetingPic(){
+    var hour = DateTime.now().hour;
+    if(hour<12){
+      return 'lib/Images/MainScreen/sun-161923_1920.png';
+    }
+    if(hour<17){
+      return 'lib/Images/MainScreen/cloud-159393_1920.png';
+    }
+    return 'lib/Images/MainScreen/full-moon-308007_1920.png';
+  }
 
   @override
   void initState() {
     super.initState();
 
-    setUp();
+    //assign token if user is not a guest
+    if (widget.users.firstName != 'Guest') {
+      PushNotifications().assignTokenToUser(widget.users);
+    }
   }
 
   @override
@@ -69,91 +64,230 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: Colors.black,
-
-
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-
-              Text("Select schedule before selecting menu options but feel free to browse the menu beforehand.",style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: Theme.of(context).colorScheme.secondary,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
-              IconButton(onPressed: () {
-                usersFirebase.signOutUser();
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SignInScreen()),
-                        (route) => false);
-              }, icon: Icon(Icons.logout_outlined)),
-
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (
-                        context) => CategoryMenuScreen(users: widget.users,datePicked: false,blackoutDates:
-                      blackoutDates,)));
-                  },
-                      child: const Text(
-                          "Food Menu", textAlign: TextAlign.center)),
-                ),
-              ),
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(onPressed: () {
-                    print("${widget.users.firstName}");
-
-                    widget.users.firstName == 'Guest' ?
-                    Navigator.push(context, MaterialPageRoute(builder: (
-                        context) =>
-                        ScheduleScreen(blackoutDates: blackoutDates, users: widget.users, eventName: '', eventLocation: '', amountOfGuest: 1
-                        ))):
-
-                    Navigator.push(context, MaterialPageRoute(builder: (
-                        context) =>
-                        OpenSchedule(
-                          users: widget.users, blackoutDates: blackoutDates,)));
-                  },
-                      child: const Text(
-                        "View Schedule", textAlign: TextAlign.center,)),
-                ),
-              ),
-
-              if(widget.users.admin && widget.users.firstName != "Guest")
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (
-                          context) =>
-                          AdminScheduleScreen(blackOutDate: blackoutDates,
-                            bookingFirebase: bookingEventsFirebase,)));
-                    },
-                        child: const Text(
-                          "Adjust Schedule", textAlign: TextAlign.center,)),
-                  ),
-                ),
-
-
-              if(widget.users.firstName != "Guest")
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (
-                          context) => const mySettings()));
-                    },
-                        child: const Text(
-                          "Settings", textAlign: TextAlign.center,)),
-                  ),
-                )
+          backgroundColor: Colors.grey[300],
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            automaticallyImplyLeading: false,
+            actions: [
 
             ],
           ),
+          body: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // topContainer(context),
+
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      decoration: const BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(50),
+                              bottomRight: Radius.circular(50)),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey,
+                                spreadRadius: 6,
+                                blurRadius: 5)
+                          ]),
+                      // height: MediaQuery.of(context).size.height * .35,
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Image.asset('lib/Images/IMG_8528.JPG'),
+                      ),
+                    ),
+                  ],
+                ).animate().slide(duration: 1500.milliseconds),
+
+                weatherContainer(context),
+
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Explore catering options using the bottom navigation tool.",
+                    style: Theme.of(context)
+                        .textTheme
+                        .displayMedium!
+                        .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              ],
+            ),
+          )),
+    );
+  }
+
+  Padding weatherContainer(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 32.0, bottom: 8, left: 16, right: 16),
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        height: 200,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25),
+            color: Theme.of(context).colorScheme.secondary,
+            boxShadow: const [
+              BoxShadow(color: Colors.grey, spreadRadius: 1, blurRadius: 2)
+            ]),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, top: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0, top: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          greeting(),
+                          style: Theme.of(context)
+                              .textTheme
+                              .displayMedium!
+                              .copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontSize: 22),
+                        ).animate().slideX(
+                            duration: 2000.milliseconds,
+                            curve: Curves.easeInCirc),
+                      ],
+                    ),
+                  ).animate().fadeIn(duration: 2000.milliseconds),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Today's Date",
+                        style: Theme.of(context)
+                            .textTheme
+                            .displaySmall!
+                            .copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ).animate().fadeIn(duration: 2000.milliseconds),
+                  Row(
+                    children: [
+                      Text(
+                        "${DateTime.now().month}/${DateTime.now().day}/${DateTime.now().year}",
+                        style: Theme.of(context)
+                            .textTheme
+                            .displaySmall!
+                            .copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 22),
+                      ),
+                    ],
+                  ).animate().fadeIn(duration: 2000.milliseconds),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        DateFormat.jm().format(DateTime.now()),
+                        style: Theme.of(context)
+                            .textTheme
+                            .displaySmall!
+                            .copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                                color: Theme.of(context).colorScheme.primary),
+                      ),
+                    ],
+                  ).animate().fadeIn(duration: 2000.milliseconds),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          "${widget.users.firstName} ${widget.users.lastName}",
+                          style: Theme.of(context)
+                              .textTheme
+                              .displaySmall!
+                              .copyWith(
+                                  color: Theme.of(context).colorScheme.primary),
+                        ),
+                      ),
+                    ],
+                  ).animate().slideX(
+                      duration: 2000.milliseconds, curve: Curves.bounceIn),
+                  Flexible(
+                    child: Row(
+                      children: [
+                        Text(widget.users.email,
+                            style: Theme.of(context)
+                                .textTheme
+                                .displaySmall!
+                                .copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary)),
+                      ],
+                    ).animate().slideX(
+                        duration: 2000.milliseconds, curve: Curves.bounceIn),
+                  )
+                ],
+              ),
+            ),
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  height: 150,
+                  child:
+                      Image.asset(greetingPic()),
+                ),
+              ).animate().fadeIn(duration: 2100.milliseconds),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+class CategoryIcon extends StatelessWidget {
+ final String image;
+  final Color backgroundColor;
+  final String text;
+
+  const CategoryIcon(
+      {super.key,
+      required this.image,
+      required this.backgroundColor,
+      required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(blurRadius: 2, color: Colors.grey, spreadRadius: 2)
+              ]),
+          child: CircleAvatar(
+            radius: 30,
+            backgroundColor: backgroundColor,
+            child: Padding(
+              padding: const EdgeInsets.all(3.0),
+              child: Image.asset(image),
+            ),
+          ),
+        ),
+        Text(
+          text,
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        )
+      ],
     );
   }
 }

@@ -9,11 +9,14 @@ class TextButtons extends StatelessWidget {
 
   final IconData iconData;
   final String text;
+  Function function;
 
-   const TextButtons({
+
+    TextButtons({
     super.key,
     required this.iconData,
-    required this.text
+    required this.text,
+     required this.function
   });
 
   @override
@@ -25,12 +28,14 @@ class TextButtons extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(iconData,color: Theme.of(context).colorScheme.secondary,),
-              Text(text,style: Theme.of(context).textTheme.displaySmall!.copyWith(color: Theme.of(context).colorScheme.secondary,fontSize: 18),),
+              Icon(iconData,color: Theme.of(context).colorScheme.primary,),
+              Text(text,style: Theme.of(context).textTheme.displaySmall!.copyWith(color: Theme.of(context).colorScheme.primary,fontSize: 18),),
             ],
           ),
 
-          IconButton(onPressed: (){}, icon: const Icon(Icons.arrow_forward_ios_outlined))
+          IconButton(onPressed: (){
+            function();
+            }, icon: const Icon(Icons.arrow_forward_ios_outlined))
         ],
       ),
     );

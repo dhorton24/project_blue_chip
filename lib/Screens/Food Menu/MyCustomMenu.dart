@@ -15,17 +15,17 @@ import '../../Custom Data/Users.dart';
 
 
 
-class MyCustomMenu extends StatefulWidget {
+class CheckOut extends StatefulWidget {
 
   final Users users;
 
-  const MyCustomMenu({super.key, required this.users});
+  const CheckOut({super.key, required this.users});
 
   @override
-  State<MyCustomMenu> createState() => _MyCustomMenuState();
+  State<CheckOut> createState() => _CheckOutState();
 }
 
-class _MyCustomMenuState extends State<MyCustomMenu> {
+class _CheckOutState extends State<CheckOut> {
 
 
   num totalServingSize =0 ;
@@ -105,72 +105,72 @@ class _MyCustomMenuState extends State<MyCustomMenu> {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height/2.2,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: StreamBuilder(
-                  stream: cartStream,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot) {
-                    //if there is an error
-                    if (snapshot.hasError) {
-                      return const Text('Error');
-                    }
-                    //while it connects
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
-                    cartList = snapshot.data!.docs;
-
-                    if (cartList.isEmpty) {
-                      return Center(
-                          child: Text(
-                            'Empty Menu.',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                color: Theme.of(context).colorScheme.primary),
-                            textAlign: TextAlign.center,
-                          ));
-                    }
-
-                    return ListView.separated(
-                      scrollDirection: Axis.horizontal
-                        ,
-                        //padding: EdgeInsets.zero,
-                        itemBuilder: (BuildContext context, int index) {
-                          Item thisItem = Item(
-                              itemName: cartList[index]['itemName'],
-                              retail: cartList[index]['retail'],
-                              itemID: cartList[index]['itemID'],
-                              itemDescription: cartList[index]
-                              ['itemDescription'],
-                              onSale: cartList[index]['onSale'],
-                              picLocation: cartList[index]['picLocation'],
-                              amountInCart: cartList[index]['amountInCart'],
-                              salePrice: cartList[index]['salePrice'],
-                              category: cartList[index]['category'],
-                          servingSize: cartList[index]['servingSize']);
-
-                          return GestureDetector(
-                              onTap: () {
-
-                              },
-                              child: CartItemTile(item: thisItem,users:  widget.users,));
-                        },
-                        separatorBuilder: (BuildContext context, int index) {
-                          return const SizedBox();
-                        },
-                        itemCount: cartList.length);
-                  },
-                ),
-              ),
-            ).animate().fadeIn(delay: Duration(milliseconds: 350)),
+            // SizedBox(
+            //   height: MediaQuery.of(context).size.height/2.2,
+            //   child: Padding(
+            //     padding: const EdgeInsets.all(8.0),
+            //     child: StreamBuilder(
+            //       stream: cartStream,
+            //       builder: (BuildContext context,
+            //           AsyncSnapshot<QuerySnapshot> snapshot) {
+            //         //if there is an error
+            //         if (snapshot.hasError) {
+            //           return const Text('Error');
+            //         }
+            //         //while it connects
+            //         if (snapshot.connectionState == ConnectionState.waiting) {
+            //           return const CircularProgressIndicator();
+            //         }
+            //         cartList = snapshot.data!.docs;
+            //
+            //         if (cartList.isEmpty) {
+            //           return Center(
+            //               child: Text(
+            //                 'Empty Menu.',
+            //                 style: Theme.of(context)
+            //                     .textTheme
+            //                     .bodyMedium!
+            //                     .copyWith(
+            //                     color: Theme.of(context).colorScheme.primary),
+            //                 textAlign: TextAlign.center,
+            //               ));
+            //         }
+            //
+            //         return ListView.separated(
+            //           scrollDirection: Axis.horizontal
+            //             ,
+            //             //padding: EdgeInsets.zero,
+            //             itemBuilder: (BuildContext context, int index) {
+            //               Item thisItem = Item(
+            //                   itemName: cartList[index]['itemName'],
+            //                   retail: cartList[index]['retail'],
+            //                   itemID: cartList[index]['itemID'],
+            //                   itemDescription: cartList[index]
+            //                   ['itemDescription'],
+            //                   onSale: cartList[index]['onSale'],
+            //                   picLocation: cartList[index]['picLocation'],
+            //                   amountInCart: cartList[index]['amountInCart'],
+            //                   salePrice: cartList[index]['salePrice'],
+            //                   category: cartList[index]['category'],
+            //               servingSize: cartList[index]['servingSize']);
+            //
+            //               return GestureDetector(
+            //                   onTap: () {
+            //
+            //                   },
+            //                   child: CartItemTile(item: thisItem,users:  widget.users,));
+            //             },
+            //             separatorBuilder: (BuildContext context, int index) {
+            //               return const SizedBox();
+            //             },
+            //             itemCount: cartList.length);
+            //       },
+            //     ),
+            //   ),
+            // ).animate().fadeIn(delay: Duration(milliseconds: 350)),
 
             StrokeText(
-              text: 'My Food Menu',
+              text: 'My Event',
               textStyle: TextStyle(
                 fontSize: 30,
                 color: Theme.of(context).colorScheme.secondary,
@@ -194,9 +194,10 @@ class _MyCustomMenuState extends State<MyCustomMenu> {
     );
   }
 
-  Row payButtons() {
+  Widget payButtons() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisSize:MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Flexible(
               child: Padding(
@@ -210,17 +211,11 @@ class _MyCustomMenuState extends State<MyCustomMenu> {
                                 borderRadius:
                                 BorderRadius.circular(7)))),
                     onPressed: () {
-                      if(cartTotal <= 0){
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(SnackBar(
-                            content: Text(
-                                "Add Items to menu")));
-                      }else{
-                        makePayment(cartTotal *.15);
-                      }
+
+                        makePayment(50.00);
                     },
                     child: Text(
-                      "Pay 15%: \$${(cartTotal *.15).toStringAsFixed(2)}",
+                      "Pay Deposit \$50.00",
                       style: Theme.of(context)
                           .textTheme
                           .displaySmall!
@@ -231,39 +226,7 @@ class _MyCustomMenuState extends State<MyCustomMenu> {
                     )),
               ),
             ),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            Theme.of(context).colorScheme.primary),
-                        shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(7)))),
-                    onPressed: () {
-                      if(cartTotal <= 0){
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(SnackBar(
-                            content: Text(
-                                "Add Items to menu")));
-                      }else{
-                        makePayment(cartTotal);
-                      }
-                    },
-                    child: Text(
-                      "Pay full: \$${cartTotal.toStringAsFixed(2)}",
-                      style: Theme.of(context)
-                          .textTheme
-                          .displaySmall!
-                          .copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12),
-                    )),
-              ),
-            )
+
           ],
         );
   }
@@ -344,6 +307,9 @@ class _MyCustomMenuState extends State<MyCustomMenu> {
       await Stripe.instance.presentPaymentSheet().then((value) => {
 
 
+
+
+        ///TODO create new method to empty event from user in database
         bookingEventsFirebase.clearShoppingCart(widget.users).whenComplete(() => ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(
             content: Text(
@@ -357,7 +323,7 @@ class _MyCustomMenuState extends State<MyCustomMenu> {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(
           content: Text(
-              "Error. Check payment details")));
+              "Error processing payment")));
     }
   }
 }

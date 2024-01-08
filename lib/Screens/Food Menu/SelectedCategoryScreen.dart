@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:project_blue_chip/Custom%20Data/TestData.dart';
+import 'package:project_blue_chip/Screens/Food%20Menu/AdminMenu/EditItemScreen.dart';
 import 'package:project_blue_chip/Widgets/ItemCell.dart';
 import 'package:stroke_text/stroke_text.dart';
 
@@ -13,18 +14,14 @@ import 'SelectedItemScreen.dart';
 class SelectedCategoryScreen extends StatefulWidget {
   final String picLocation;
   final String title;
-  final List<Item> cartList;
   final Users users;
-  final bool datePicked;
-  final List<DateTime> blackoutDates;
+
 
   const SelectedCategoryScreen(
       {super.key, required this.picLocation,
       required this.title,
-      required this.cartList,
       required this.users,
-      required this.datePicked,
-      required this.blackoutDates});
+      });
 
   @override
   State<SelectedCategoryScreen> createState() => _SelectedCategoryScreenState();
@@ -62,7 +59,7 @@ class _SelectedCategoryScreenState extends State<SelectedCategoryScreen> {
                       containerLength: 3,
                       withBorder: true, customPic: false,
                       
-                    ).animate().fadeIn(),
+                    ).animate().fadeIn(duration: 1500.milliseconds),
                     SafeArea(
                         child: IconButton(
                             onPressed: () {
@@ -118,6 +115,11 @@ class _SelectedCategoryScreenState extends State<SelectedCategoryScreen> {
                                 category: cartList[index]['category']);
 
                             return GestureDetector(
+                              onLongPress: (){
+                                if(widget.users.admin){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>EditItemScreen(item: thisItem,)));
+                                }
+                              },
                                 onTap: () {
                                   Navigator.push(
                                       context,
@@ -126,11 +128,10 @@ class _SelectedCategoryScreenState extends State<SelectedCategoryScreen> {
                                               SelectedItemScreen(
                                                   item: thisItem,
                                                   users: widget.users,
-                                              datePicked: widget.datePicked,
-                                              blackoutDates: widget.blackoutDates,)));
+                                              )));
                                 },
                                 child: ItemCell(
-                                    item: thisItem, users: widget.users,datePicked: widget.datePicked,blackoutDates: widget.blackoutDates,));
+                                    item: thisItem, users: widget.users,).animate().slideX(duration: 1000.milliseconds));
                           },
                           separatorBuilder: (BuildContext context, int index) {
                             return const SizedBox();

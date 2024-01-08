@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_blue_chip/Custom%20Data/BlackOutDates.dart';
 import 'package:project_blue_chip/Custom%20Data/Events.dart';
+import 'package:project_blue_chip/Firebase/UserFirebase.dart';
 import 'package:uuid/uuid.dart';
 
 import '../Custom Data/Item.dart';
@@ -136,11 +137,13 @@ class BookingEventsFirebase {
   }
 
   Future createBlackOutDate(DateTime startTime, bool isAllDay) async {
-    BlackOutDates blackOutDates =
-        BlackOutDates(startTime: startTime, isAllDay: isAllDay);
+
 
     var uuid = const Uuid();
     var id = uuid.v4();
+
+    BlackOutDates blackOutDates =
+    BlackOutDates(startTime: startTime, isAllDay: isAllDay,id: id);
 
     //create ref for blackoutDates
     final docRef = FirebaseFirestore.instance
@@ -152,6 +155,15 @@ class BookingEventsFirebase {
                 blackOutDates.toFireStore());
 
     docRef.set(blackOutDates);
+  }
+
+  Future deleteBlackoutDate(BlackOutDates blackOutDates)async{
+    final docRef = FirebaseFirestore.instance
+        .collection('blackOutDates')
+        .doc(blackOutDates.id);
+
+    await docRef.delete();
+
   }
 
   Future uploadEvent(DateTime startTime, int length, Users users,
@@ -166,7 +178,7 @@ class BookingEventsFirebase {
         id: id,
         complete: false,
         approved: false,
-        depositPaid: false,
+        depositPaid: true,
         paidInFull: false,
         phoneNumber: users.phoneNumber,
         clientId: users.id,
@@ -176,9 +188,11 @@ class BookingEventsFirebase {
         eventName: eventName,
         eventLocation: eventLocation,
         amountOfGuest: amountOfGuest,
-    total: '');
+        total: '');
 
     final docRef = FirebaseFirestore.instance
+       // .collection('users')
+        //.doc(users.id)
         .collection('bookingEvents')
         .doc(id)
         .withConverter(
@@ -190,9 +204,33 @@ class BookingEventsFirebase {
   }
 
   List<BookingEvents> bookingEvents = [];
-  getAllEvents(){
 
+  getAllEvents() {
     bookingEvents.clear();
+    //
+    // final userRef = FirebaseFirestore.instance
+    //     .collection('users')
+    //     .withConverter(
+    //         fromFirestore: Users.fromFireStore,
+    //         toFirestore: (Users bookingEvents, options) =>
+    //             bookingEvents.toFireStore());
+    // late var docRef;
+    // userRef.get().then((value) => {
+    //       value.docs.forEach((element) {
+    //         docRef = FirebaseFirestore.instance
+    //             .collection('users')
+    //             .doc(element.data().id)
+    //             .collection('bookingEvents')
+    //             .withConverter(
+    //             fromFirestore: BookingEvents.fromFireStore,
+    //             toFirestore: (BookingEvents bookingEvents, options) =>
+    //                 bookingEvents.toFireStore())
+    //             .get()
+    //             .then((value) => {value.docs.forEach((element) {
+    //               bookingEvents.add(element.data());
+    //         })});
+    //       })
+    //     });
 
     final docRef = FirebaseFirestore.instance
         .collection('bookingEvents').withConverter(
@@ -203,6 +241,33 @@ class BookingEventsFirebase {
       }),
       print("bookingEvents length ${bookingEvents.length}")
     });
+  }
+
+  Future approveEvent(BookingEvents bookingEvents) async{
+    final docRef = FirebaseFirestore.instance
+        .collection('bookingEvents').doc(bookingEvents.id).withConverter(
+        fromFirestore: BookingEvents.fromFireStore,
+        toFirestore: (BookingEvents bookingEvents, options) => bookingEvents.toFireStore());
+
+    docRef.update({'approved':true});
+  }
+
+  Future completeEvent(BookingEvents bookingEvents) async{
+    final docRef = FirebaseFirestore.instance
+        .collection('bookingEvents').doc(bookingEvents.id).withConverter(
+        fromFirestore: BookingEvents.fromFireStore,
+        toFirestore: (BookingEvents bookingEvents, options) => bookingEvents.toFireStore());
+
+    docRef.update({'complete':true});
+  }
+
+  Future deleteEvent(BookingEvents bookingEvents) async{
+    final docRef = FirebaseFirestore.instance
+        .collection('bookingEvents').doc(bookingEvents.id).withConverter(
+        fromFirestore: BookingEvents.fromFireStore,
+        toFirestore: (BookingEvents bookingEvents, options) => bookingEvents.toFireStore());
+
+   docRef.delete();
   }
 
   ///empty shopping cart

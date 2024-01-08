@@ -2,11 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:project_blue_chip/Custom%20Data/Events.dart';
+import 'package:project_blue_chip/Custom%20Data/PageView.dart';
 import 'package:project_blue_chip/Firebase/BookingEventsFirebase.dart';
+import 'package:project_blue_chip/Screens/Schedule/Admin/BlackoutDateScreen.dart';
 import 'package:project_blue_chip/Screens/Schedule/Admin/SelectedEventScreen.dart';
 import 'package:stroke_text/stroke_text.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
+import '../../../Custom Data/BlackOutDates.dart';
 import '../../../Widgets/EventCell.dart';
 
 class AdminScheduleScreen extends StatefulWidget {
@@ -56,6 +59,7 @@ class _AdminScheduleScreenState extends State<AdminScheduleScreen> {
   //     .snapshots();
 
   List<DocumentSnapshot> cartList = [];
+  List<DateTime> blackoutDates = [];
 
   setUp() async {
     cartStream = FirebaseFirestore.instance
@@ -64,6 +68,29 @@ class _AdminScheduleScreenState extends State<AdminScheduleScreen> {
 
 
   }
+
+
+  getDates()async{
+    widget.blackOutDate.clear();
+
+    final docRef = FirebaseFirestore.instance
+        .collection('blackOutDates')
+        .withConverter(
+        fromFirestore: BlackOutDates.fromFireStore,
+        toFirestore: (BlackOutDates blackOutDates, options) =>
+            blackOutDates.toFireStore())
+        .get()
+        .then((value) async => {
+      value.docs.forEach((element) {
+        widget.blackOutDate.add(element.data().startTime);
+        print("${element.data().startTime}");
+      }),
+      // print("Black out")
+    });
+
+    bookingEventsFirebase.getAllEvents();
+  }
+
 
   @override
   void initState() {
@@ -74,67 +101,82 @@ class _AdminScheduleScreenState extends State<AdminScheduleScreen> {
     //     .snapshots();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: setUp(),
         builder: (BuildContext context, AsyncSnapshot text) {
           return Scaffold(
-            backgroundColor: Colors.black,
+            backgroundColor: Colors.grey[300],
             appBar: AppBar(
               backgroundColor: Colors.black,
-              title: StrokeText(
-                text: 'Adjust Schedule',
-                textStyle: TextStyle(
-                  fontSize: 28,
-                  color: Theme
-                      .of(context)
-                      .colorScheme
-                      .secondary,
-                  fontWeight: FontWeight.bold,
-                ),
-                strokeColor: Theme
-                    .of(context)
-                    .colorScheme
-                    .primary,
-                strokeWidth: 3,
-              ),
-              leading: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(
-                    Icons.arrow_back_outlined,
-                    color: Colors.white,
-                  )),
+              automaticallyImplyLeading: false,
+              actions: [IconButton(onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>const BlackoutDateScreen()));
+              }, icon: const Icon(Icons.admin_panel_settings_outlined,color: Colors.white,)),
+
+
+                IconButton(onPressed: (){
+
+                  //refresh screen
+                  setState(() {
+                    getDates();
+                  });
+                }, icon: const Icon(Icons.refresh_outlined,color: Colors.white,))
+              ],
             ),
             body: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text("Select an event to choose an option. Select a date to change availability or to show that day's events.",textAlign: TextAlign.center,style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: Theme.of(context).colorScheme.secondary,fontWeight: FontWeight.bold),),
-                ),
+
+                Container(
+                  decoration: const BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(50),
+                          bottomRight: Radius.circular(50)),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey,
+                            spreadRadius: 6,
+                            blurRadius: 5)
+                      ]),
+                  child: Column(
+                    children: [
+                      Center(
+                        child: StrokeText(
+                          text: 'Admin Calendar',
+                          textStyle: TextStyle(
+                            fontSize: 28,
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          strokeColor: Theme.of(context).colorScheme.primary,
+                          strokeWidth: 3,
+                        ),
+                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.all(16.0),
+                      //   child: Text("Select an event to choose an option. Select a date to change availability or to show that day's events.",textAlign: TextAlign.center,style: Theme.of(context).textTheme.displaySmall!.copyWith(color: Theme.of(context).colorScheme.primary,fontSize: 16),),
+                      // ),
+                    ],
+                  ),
+                ).animate().slide(duration: 1500.milliseconds),
+
+
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
 
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Theme
-                                  .of(context)
-                                  .primaryColor,
-                              blurRadius: 9,
-                              spreadRadius: 10)
-                        ]),
+                        borderRadius: BorderRadius.circular(20)),
                     height: MediaQuery
                         .of(context)
                         .size
                         .height / 2,
                     child: Calendar(context),
                   ),
-                ).animate().slide(),
+                ).animate().slide(duration: 1000.milliseconds),
 
                 // Container(
                 //     height: MediaQuery
@@ -203,6 +245,11 @@ class _AdminScheduleScreenState extends State<AdminScheduleScreen> {
                               },
                                 child: EventCell(meeting: thisEvent)
                             );
+                            }else{
+                             return const Padding(
+                               padding: EdgeInsets.all(8.0),
+                               child: Text("No events..."),
+                             );
                             }
                           },
                           separatorBuilder: (BuildContext context, int index) {
@@ -218,10 +265,10 @@ class _AdminScheduleScreenState extends State<AdminScheduleScreen> {
         });
   }
 
-  SfCalendar Calendar(BuildContext context) {   //calendar
+  Widget Calendar(BuildContext context) {   //calendar
     return SfCalendar(
       minDate: DateTime.now(),
-      backgroundColor: Colors.grey[700],
+      //backgroundColor: Colors.transparent,
 
       todayTextStyle: Theme
           .of(context)
@@ -293,9 +340,6 @@ class _AdminScheduleScreenState extends State<AdminScheduleScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  ElevatedButton(
-                      onPressed: () {},
-                      child: const Text("Decide on events")),
 
                   ElevatedButton(
                       onPressed: () {
@@ -315,7 +359,7 @@ class _AdminScheduleScreenState extends State<AdminScheduleScreen> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text("Cancel"))
+                      child: const Text("Cancel"))
                 ],
               )
             ],

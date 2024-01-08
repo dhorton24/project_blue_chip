@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.12.0+13
 
 environment:
   sdk: '>=3.2.2 <4.0.0'
@@ -50,6 +50,9 @@ dependencies:
   booking_calendar: ^1.1.10
   day_night_time_picker: ^1.3.0+1
   intl: ^0.18.1
+  firebase_messaging: ^14.7.4
+  flutter_local_notifications: ^16.3.0
+  spring: ^2.0.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -57,6 +60,10 @@ dependencies:
   table_calendar: ^3.0.9
   syncfusion_flutter_calendar: ^23.2.7
   firebase_core: ^2.24.2
+  is_first_run: ^1.0.0
+  page_animation_transition: ^1.0.0
+  persistent_bottom_nav_bar: ^5.0.2
+  animated_rotating_widget: ^0.0.2
 
 dev_dependencies:
   flutter_test:
@@ -97,6 +104,17 @@ flutter:
     - lib/Images/apple-logo-52C416BDDD-seeklogo.com.png
     - lib/Images/under-construction-2629947_1920.jpg
     - lib/Images/note-42883_1920.png
+    - lib/Images/NachoMommaAppIcon.png
+    - lib/Images/FirstTime/glutenFree.png
+    - lib/Images/FirstTime/nachos-8152413_1920.png
+    - lib/Images/FirstTime/apron-2814565_1920.png
+    - lib/Images/FirstTime/anniversary-157248_1920.png
+    - lib/Images/MainScreen/dish-5079769_1920.jpg
+    - lib/Images/MainScreen/White-plate-isolated-on-transparent-background-PNG.png
+    - lib/Images/MainScreen/sun-161923_1920.png
+    - lib/Images/MainScreen/cloud-159393_1920.png
+    - lib/Images/MainScreen/full-moon-308007_1920.png
+    - lib/Images/Nacho Momma Abbreviated Banner.JPG
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

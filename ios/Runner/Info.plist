@@ -11,7 +11,7 @@
     <!-- Copied from GoogleService-Info.plist key CLIENT_ID -->
     <string>986161942967-jj2g8etj2vhq2a3h7nj4s7fo2tpr00dc.apps.googleusercontent.com</string>
 	<key>CFBundleDisplayName</key>
-	<string>Project Blue Chips</string>
+	<string>Nacho Momma's Average Nacho</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<!-- Put me in the [my_project]/ios/Runner/Info.plist file -->

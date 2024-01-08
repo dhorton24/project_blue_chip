@@ -39,7 +39,8 @@ class _EventCellState extends State<EventCell> {
         child: Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               
               CircleAvatar(
@@ -48,16 +49,18 @@ class _EventCellState extends State<EventCell> {
               ),
               
               Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+
                 children: [
                   Text(widget.meeting.eventName,style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).colorScheme.secondary,fontWeight: FontWeight.bold),),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text("${widget.meeting.startTime.month}/${widget.meeting.startTime.day}/${widget.meeting.startTime.year}",style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Theme.of(context).colorScheme.secondary,)),
                       ),
+
+
 
 
 
@@ -71,11 +74,7 @@ class _EventCellState extends State<EventCell> {
                   )
                 ],
               ),
-              
-              
-              IconButton(onPressed: (){
-                optionsDialog(widget.meeting.startTime);
-              }, icon: Icon(Icons.more_vert_outlined,color:  Theme.of(context).colorScheme.secondary,))
+
             ],
           ),
         ),

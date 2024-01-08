@@ -106,12 +106,13 @@ class _PictureHeaderState extends State<PictureHeader> {
                     const BorderRadius.only(bottomRight: Radius.circular(20), bottomLeft: Radius.circular(20)):
                     const BorderRadius.only(bottomRight: Radius.circular(0), bottomLeft: Radius.circular(0)),
                 ),
-                child: url != null
+                child:
+                url != null
                 ? Image.network(
                 url.toString(),
                 fit: BoxFit.fill,
                 )
-                    : const CircularProgressIndicator()),
+                    : Image.asset('lib/Images/under-construction-2629947_1920.jpg',fit: BoxFit.fill,)),
 
 
               Padding(

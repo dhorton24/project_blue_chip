@@ -1,14 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:project_blue_chip/Custom%20Data/ConstantDatabase.dart';
+import 'package:project_blue_chip/Firebase/UserFirebase.dart';
+import 'package:project_blue_chip/Screens/Settings/EditAccountScreen.dart';
+import 'package:project_blue_chip/Screens/Settings/MyEventsScreen.dart';
 import 'package:stroke_text/stroke_text.dart';
 
+import '../../Custom Data/Users.dart';
 import '../../Widgets/TextButtons.dart';
+import '../LogIn/SignInScreen.dart';
 
 
 
 
 class mySettings extends StatefulWidget {
-  const mySettings({super.key});
+
+  Users users;
+
+  mySettings({super.key, required this.users});
 
   @override
   State<mySettings> createState() => _mySettingsState();
@@ -18,87 +29,142 @@ class _mySettingsState extends State<mySettings> {
 
 
   bool notifications = true;
+  bool toggle = true;
+
+  UsersFirebase usersFirebase = UsersFirebase();
+
+  @override
+  void initState() {
+    super.initState();
+
+    //setUp();
+
+    toggle= widget.users.notificationsOn;
+
+    // DocumentReference totalReference =
+    // FirebaseFirestore.instance.collection('users').doc(widget.users.id);
+    //
+    // totalReference.snapshots().listen((event) {
+    //   if(mounted) {
+    //     setState(() {
+    //       widget.users.notificationsOn = event.get('notificationsOn');
+    //       toggle = widget.users.notificationsOn;
+    //     });
+    //   }
+    // });
+
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
         backgroundColor: Colors.black,
-          title: StrokeText(
-            text: 'Settings',
-            textStyle: TextStyle(
-              fontSize: 48,
-              color: Theme.of(context).colorScheme.secondary,
-              fontWeight: FontWeight.bold,
-            ),
-            strokeColor: Theme.of(context).colorScheme.primary,
-            strokeWidth: 3,
-          ),
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.arrow_back_outlined,
-              color: Colors.white,
-            )),
+        actions: [
+          IconButton(
+              onPressed: () {
+                usersFirebase.signOutUser();
+                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignInScreen()), (route) => false);
+              },
+              icon: const Icon(
+                Icons.logout_outlined,
+                color: Colors.white,
+              ))
+        ],
       ),
 
       body: Column(
         children: [
-          Image.asset('lib/Images/IMG_8528.JPG').animate().flip(),
-
-
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("Dedrick Horton",style: Theme.of(context).textTheme.displayMedium!.copyWith(color: Theme.of(context).colorScheme.secondary),),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(50),
+                        bottomRight: Radius.circular(50)),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey,
+                          spreadRadius: 6,
+                          blurRadius: 5)
+                    ]),
+                // height: MediaQuery.of(context).size.height * .35,
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Image.asset('lib/Images/IMG_8528.JPG'),
+                ),
+              ).animate().slide(duration: 1500.milliseconds),
+            ],
           ),
 
-          ElevatedButton(onPressed: (){
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text("${widget.users.firstName} ${widget.users.lastName}",style: Theme.of(context).textTheme.displayMedium!.copyWith(color: Theme.of(context).colorScheme.primary),),
+          ),
 
-          }, child: Text('Edit Profile',style: Theme.of(context).textTheme.displaySmall!.copyWith(color: Theme.of(context).colorScheme.primary,fontSize: 22),),
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.secondary)
-          ),),
+
+          Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Powered by',style: Theme.of(context).textTheme.displaySmall!.copyWith(color: Theme.of(context).colorScheme.primary, fontSize: 16),),
+                  Container(
+                      height: 50,
+                      width:100,
+                      child: Image.asset('lib/Images/CITex_noBack.png',fit: BoxFit.fitWidth,))
+                ],
+              ),
+              Text("Version: ${ConstantDatabase().version}")
+            ],
+          ),
 
 
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(left: 8.0,right: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.notifications_active_outlined,color: Theme.of(context).colorScheme.secondary,),
-                    Text("Notifications",style: Theme.of(context).textTheme.displaySmall!.copyWith(color: Theme.of(context).colorScheme.secondary,fontSize: 18),),
+                    Icon(Icons.notifications_active_outlined,color: Theme.of(context).colorScheme.primary,),
+                    Text("Notifications",style: Theme.of(context).textTheme.displaySmall!.copyWith(color: Theme.of(context).colorScheme.primary,fontSize: 18),),
                   ],
                 ).animate().fadeIn(),
 
                 Switch(
-                    inactiveThumbColor: Colors.grey,
                     activeColor: Theme.of(context).colorScheme.primary,
-                    value: notifications, onChanged: (value)=>{
-                      setState((){
-                        notifications = value;
-                      })
-                }).animate().fadeIn()
+                    value: toggle,
+                    onChanged: (value) async {
+
+                      setState(() {
+                        widget.users.notificationsOn = value;
+                        toggle = value;
+                      });
+
+                      //TODO change notification in firebase here
+                      await usersFirebase.toggleNotification(widget.users);
+                    }).animate().fadeIn()
               ],
             ),
           ),
 
-          TextButtons(iconData: Icons.privacy_tip_outlined,text: 'Privacy',).animate().fadeIn(),
-          TextButtons(iconData: Icons.person_2_outlined,text: 'Account',).animate().fadeIn(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Powered by',style: Theme.of(context).textTheme.displaySmall!.copyWith(color: Theme.of(context).colorScheme.secondary, fontSize: 16),),
-              Container(
-                  height: 100,
-                  width:100,
-                  child: Image.asset('lib/Images/CITex_noBack.png'))
-            ],
-          )
+           TextButtons(iconData: Icons.person_2_outlined,text: 'Account',function: (){
+             Navigator.push(context, MaterialPageRoute(builder: (context)=>EditAccountScreen(users: widget.users,)));
+           },).animate().fadeIn(),
+           TextButtons(iconData: Icons.event_available_outlined,text: 'My Events',function: (){
+             Navigator.push(context, MaterialPageRoute(builder: (context)=>MyEventsScreen(users: widget.users,)));
+
+           }).animate().fadeIn(),
+           TextButtons(iconData: Icons.privacy_tip_outlined,text: 'Privacy',function: (){
+             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No privacy policy made yet")));
+           }).animate().fadeIn(),
+
 
         ],
       ),

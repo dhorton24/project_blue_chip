@@ -3,14 +3,7 @@
 import 'Item.dart';
 
 class TestData{
-
-  List<Item> itemList = [
-
-    Item(itemName: 'Fajitas Chicken or Steak', retail: 10.00, itemID: 'eraghrheah', itemDescription: 'Served with corn tortilla, mixed sauteed onion and peppers. And white cheese dip and chips', onSale: false,picLocation: 'lib/Images/IMG-3122.jpg', category: 'Nachos'),
-    Item(itemName: 'The Wonder Boy', retail: 8.99, itemID: 'ahgah', itemDescription: 'A Mix of toppings to go along with crinkle cut fires', onSale: false,picLocation: 'lib/Images/IMG-3126.jpg',category: 'Misc')
-
-
-  ];
+  //
 
 
   List<String> categoryName = ["Nachos",'Enchiladas','Pasta','Misc.'];

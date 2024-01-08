@@ -262,4 +262,24 @@ class UsersFirebase{
   }
 
 
+  Future toggleNotification(Users user) async{
+
+    final createRef =
+    FirebaseFirestore.instance.collection('users').doc(user.id);
+
+    createRef.update({'notificationsOn': user.notificationsOn});
+  }
+
+  Future updateUser(Users users)async{
+
+    final createRef =
+    FirebaseFirestore.instance.collection('users').doc(users.id);
+
+    createRef.update({'firstName': users.firstName});
+    createRef.update({'lastName': users.lastName});
+    createRef.update({'phoneNumber': users.phoneNumber});
+
+  }
+
+
 }

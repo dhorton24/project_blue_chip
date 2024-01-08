@@ -6,9 +6,12 @@ class BlackOutDates{
 
   bool isAllDay;  //if unavailable all day
 
+  String id;
+
 
 BlackOutDates({required this.startTime,
-required this.isAllDay});
+required this.isAllDay,
+required this.id});
 
   factory BlackOutDates.fromFireStore(
       DocumentSnapshot<Map<String, dynamic>> snapshot,
@@ -16,14 +19,16 @@ required this.isAllDay});
     final data = snapshot.data();
     return BlackOutDates(
         startTime: (data?['startTime'] as Timestamp).toDate(),
-      isAllDay: data?['isAllDay']
+      isAllDay: data?['isAllDay'],
+      id: data?['id']
     );
   }
 
   Map<String, dynamic> toFireStore() {
     return {
       'startTime': startTime,
-      'isAllDay':isAllDay
+      'isAllDay':isAllDay,
+      'id':id
     };
   }
 
